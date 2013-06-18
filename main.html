@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>{{ title }}</title>
+	<base href="{{ path }}"/> 
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 	<meta name="robots" content="noarchive" />
 	<meta name="googlebot" content="noarchive" />
@@ -21,7 +22,12 @@
 		<tr>
 			<td>{{ escape(f.timestamp) }}</td>
 			<td>{{ escape(f.file_type) }}</td>
-			<td><a href="{{ escape(  path + '/' + f.filename) }}">{{ escape(f.filename) }}</a></td>
+			{% if path %}
+				<td><a href="{{ escape(  '/' + path + '/' + f.filename) }}">{{ escape(f.filename) }}</a></td>
+			{% else %}
+				<td><a href="{{ escape( '/' + f.filename) }}">{{ escape(f.filename) }}</a></td>
+			{% end %}
+			
 			{% if f.file_type != 'dir' %}
 				<td> {{f.size}} bytes </td>
 			{% else %}
