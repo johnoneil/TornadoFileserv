@@ -102,10 +102,12 @@ class Download(tornado.web.RequestHandler):
 
       #send the file as a series of arbitrary chunk sizes
       with open(system_filepath, 'rb') as f:
-        chunk_number = 1
-        while True:
+        #dumb required check to see if iostream object has failed
+        #no other way to detect broken pipe, apparently
+        while not self.request.connection.stream.closed():
           data = f.read(options.chunksize)
-          if not data: break
+          if not data:
+            break
           #write binary data into our output buffer and then flush the
           #buffer to the network. This vastly increases download time and
           #decreases the memory requirements on the server as we no longer
@@ -113,7 +115,9 @@ class Download(tornado.web.RequestHandler):
           self.write(data)
           self.flush()
       self.finish()
-    else:#handle directory
+
+    #handle directory request
+    else:
       print 'handling directory ' + system_filepath
       items = os.listdir(system_filepath)
       files = []
@@ -131,7 +135,6 @@ class Download(tornado.web.RequestHandler):
         directory_name = directory_name  + os.path.basename(os.path.normpath(system_filepath))
       
       self.render("main.html",title=directory_name,path=filepath, files=files)
-
 
 
 class FileServer(tornado.web.Application):
