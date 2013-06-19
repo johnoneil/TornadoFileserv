@@ -84,7 +84,7 @@ class Download(tornado.web.RequestHandler):
     print "filepath is " + filepath
 
     #discern our local system internal path corresponding to the URL
-    system_filepath = os.path.normpath(options.dir +'/'+ filepath)
+    system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
     print 'System local filepath for GET is "' + system_filepath +'"'
 
     #TODO: Limit paths to children of base path (confine browsing)
@@ -150,7 +150,7 @@ class Download(tornado.web.RequestHandler):
           paths.insert(0, pathdata(di,localpath) )
         if not se: break
         localpath = pa
-      base_dir = os.path.basename(os.path.normpath(options.dir))
+      base_dir = os.path.basename(os.path.normpath(os.path.abspath(options.dir)))
       base_dir = base_dir.replace('/','')
       paths.insert(0,pathdata(base_dir,''))
       
