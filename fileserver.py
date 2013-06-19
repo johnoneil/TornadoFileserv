@@ -29,6 +29,7 @@ from tornado.options import define, options
 define('port', default=8888)
 define('dir',default='.')
 define('chunksize',default=16384)
+define('static',default='./')
 
 class filedata:
   def __init__(self,filepath,filename):
@@ -73,7 +74,7 @@ class List(tornado.web.RequestHandler):
 
     files.sort(key = lambda x: x.epochtime,reverse=True)
     directory_name = os.path.basename(os.path.normpath(options.dir))
-    self.render("main.html",title='Contents of '+ directory_name, items=files)
+    self.render(options.static + 'main.html',title='Contents of '+ directory_name, items=files)
 
 class Download(tornado.web.RequestHandler):
   @tornado.web.asynchronous
@@ -160,7 +161,7 @@ class FileServer(tornado.web.Application):
   def __init__(self, dir_path):
     self.dir_path = dir_path
     handlers = [
-      (r"/css/(.*)", tornado.web.StaticFileHandler, {'path': '/home/joneil/code/TornadoFileserv/css'}),
+      (r"/static/(.*)", tornado.web.StaticFileHandler, {'path': options.static }),
       (r'/(.*)', Download),
     ]
     settings = {}
