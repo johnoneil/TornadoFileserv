@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{ title }}</title>
-	<base href="{{ path }}"/> 
+	<title>{{ path }}</title>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 	<meta name="robots" content="noarchive" />
 	<meta name="googlebot" content="noarchive" />
@@ -15,7 +14,9 @@
 <body>
 	<div id="wrap">
 
-		<h1>{{ title }}</h1>
+		<h1>
+		{% for p in path_urls %}<a href="/{{ p.path }}">{{ p.name }}</a>/{% end %}		
+		</h1>
 
 		<table>
 		{% for f in files %}

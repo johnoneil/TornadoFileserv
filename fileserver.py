@@ -57,6 +57,11 @@ class filedata:
     else:
       return 'dir'
 
+class pathdata:
+  def __init__(self,name,path):
+    self.name = name
+    self.path = path
+
 class List(tornado.web.RequestHandler):
   def get(self):
     items = os.listdir(options.dir)
@@ -133,8 +138,22 @@ class Download(tornado.web.RequestHandler):
       directory_name = os.path.basename(os.path.normpath(options.dir)) + '/'
       if(filepath):
         directory_name = directory_name  + os.path.basename(os.path.normpath(system_filepath))
+
+      #form list of recursive file directory path, so we can write links to all levels
+      #in the HTML template.
+      paths = []
+      localpath = filepath
+      while(True):
+        (pa, se, di) = localpath.rpartition('/')
+        if di:
+          paths.insert(0, pathdata(di,localpath) )
+        if not se: break
+        localpath = pa
+      base_dir = os.path.basename(os.path.normpath(options.dir))
+      base_dir = base_dir.replace('/','')
+      paths.insert(0,pathdata(base_dir,''))
       
-      self.render("main.html",title=directory_name,path=filepath, files=files)
+      self.render("main.html",title=directory_name,path=filepath, files=files, path_urls=paths)
 
 
 class FileServer(tornado.web.Application):
