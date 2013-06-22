@@ -6,7 +6,7 @@
 	<meta name="robots" content="noarchive" />
 	<meta name="googlebot" content="noarchive" />
 	<link rel="stylesheet" href="/static/style.css" type="text/css" />
-	<link rel="icon" type="image/ico" href="/static/favicon.ico"/>
+	<link rel="icon" type="image/ico" href="/static/icons/favicon.ico"/>
 
 <script>
 
@@ -23,12 +23,7 @@
 			{% if path %}<a href="{{ escape(  '/' + path + '/' + f.filename) }}">
 			{% else %}<a href="{{ escape( '/' + f.filename) }}">
 			{% end %}
-			{% if f.file_type == 'video' %}<img src="/static/icons/movie.gif" alt="video" title="video"/>
-			{% elif f.file_type == 'audio' %}<img src="/static/icons/sound2.gif" alt="audio" title="audio"/>
-			{% elif f.file_type == 'picture' %}<img src="/static/icons/image-x-generic.png" alt="picture" title="picture"/>
-			{% elif f.file_type == 'dir' %}<img src="/static/icons/dir.gif" alt="dir" title="dir"/>
-			{% elif f.file_type == 'archive' %}<img src="/static/icons/package-x-generic.png" alt="archive" title="archive"/>
-			{% else %}<img src="/static/icons/generic.gif" alt="file" title="file"/>{% end %}
+			<img src="/static/icons/{{ f.file_type }}.gif" alt="{{ f.file_type }}" title="{{ f.file_type }}"/>
 			{% if path %}{{ escape(f.filename) }}</a></td>
 			{% else %}{{ escape(f.filename) }}</a></td>
 			{% end %}
