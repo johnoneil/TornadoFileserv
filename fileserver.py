@@ -36,7 +36,7 @@ class filedata:
     self.filename = filename
     self.full_path = filepath + '/' + filename
     self.epoch_time =  time.localtime(os.path.getmtime(self.full_path))
-    self.timestamp = time.strftime('%a, %b %d %y', self.epoch_time)
+    self.timestamp = time.strftime('%a, %b %d %Y', self.epoch_time)
     self.file_type = self.GetFileType(self.full_path)
     self.size = str(os.path.getsize(self.full_path))
 
