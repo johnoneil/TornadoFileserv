@@ -35,6 +35,8 @@ class filedata:
   def __init__(self,filepath,filename):
     self.filename = filename
     self.full_path = filepath + '/' + filename
+    if os.path.isdir(self.full_path):
+      self.filename = self.filename + '/'
     self.epoch_time =  time.localtime(os.path.getmtime(self.full_path))
     self.timestamp = time.strftime('%a, %b %d %Y', self.epoch_time)
     self.file_type = self.GetFileType(self.full_path)
@@ -81,17 +83,62 @@ class pathdata:
     self.path = path
 
 class List(tornado.web.RequestHandler):
-  def get(self):
-    items = os.listdir(options.dir)
+  def get_current_user(self):
+    return self.get_secure_cookie("user")
+
+  @tornado.web.authenticated
+  @tornado.web.asynchronous
+  def get(self, filepath=''):
+    print 'current user is ' + tornado.escape.xhtml_escape(self.current_user)
+
+    #for root URL, filepath is apparently disagreeable
+    if not filepath:filepath=''
+    print 'listing contents of directory :' + filepath
+
+    #discern our local system internal path corresponding to the URL
+    system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
+
+    #TODO: Limit paths to children of base path (confine browsing)
+
+    #is this a nonsense URL?
+    if not os.path.exists(system_filepath):
+      return self.send_error(status_code=404)
+
+    #TODO: if by chance this URL corresponds to a file, redirect to Download hander
+    if os.path.isfile(system_filepath):
+      return self.send_error(status_code=404)
+
+    #render the contents fo the system directory path
+    items = os.listdir(system_filepath)
     files = []
 
     for item in items:
-      current_file = filedata(options.dir,item)
+      current_file = filedata(system_filepath,item)
       files.append(current_file)
+    #sort the files in the directory according to their timestamp
+    files.sort(key = lambda x: x.epoch_time,reverse=True)
+    
+    #form a friendly path to this directory, appending base system directory
+    #name to the URL path
+    directory_name = os.path.basename(os.path.normpath(options.dir)) + '/'
+    if(filepath):
+      directory_name = directory_name  + os.path.basename(os.path.normpath(system_filepath))
 
-    files.sort(key = lambda x: x.epochtime,reverse=True)
-    directory_name = os.path.basename(os.path.normpath(options.dir))
-    self.render(options.static + 'main.html',title='Contents of '+ directory_name, items=files)
+    #form list of recursive file directory path, so we can write links to all levels
+    #in the HTML template.
+    paths = []
+    localpath = filepath
+    while(True):
+      (pa, se, di) = localpath.rpartition('/')
+      if di:
+        paths.insert(0, pathdata(di,localpath+'/') )
+      if not se: break
+      localpath = pa
+    base_dir = os.path.basename(os.path.normpath(os.path.abspath(options.dir)))
+    base_dir = base_dir.replace('/','')
+    paths.insert(0,pathdata(base_dir,''))
+    
+    self.render("main.html",title=directory_name,path=filepath, files=files, path_urls=paths)
 
 class Download(tornado.web.RequestHandler):
   def get_current_user(self):
@@ -104,79 +151,43 @@ class Download(tornado.web.RequestHandler):
 
     #for root URL, filepath is apparently disagreeable
     if not filepath:filepath=''
+    print 'Serving file ' + filepath
 
     #discern our local system internal path corresponding to the URL
     system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
-
-    #TODO: Limit paths to children of base path (confine browsing)
 
     #is this a nonsense URL?
     if not os.path.exists(system_filepath):
       return self.send_error(status_code=404)
 
-    #if this is a file, we'll send the file contents to the user
-    #TODO: check user authentication
-    if os.path.isfile(system_filepath):
-      filesize = str(os.path.getsize(system_filepath))
-      filename = os.path.basename(system_filepath)
-      print 'file ' + filename + ' requested at ' + system_filepath + ' of size ' + filesize
-      self.set_header('Content-type', 'octet/stream')
-      self.set_header('Content-Disposition', 'attachment; filename="' + filename+'"')
-      self.set_header('Content-Length',filesize)
-      
-      #TODO: flush the header to client and allow them to "accept" or "cancel"
-      #the file transfer before we start to send chunks?
+    #TODO: If, by chance this URL is a directory, redirect to LIST handler
+    if os.path.isdir(system_filepath):
+      return self.send_error(status_code=404)
 
-      #send the file as a series of arbitrary chunk sizes
-      with open(system_filepath, 'rb') as f:
-        #dumb required check to see if iostream object has failed
-        #no other way to detect broken pipe, apparently
-        while not self.request.connection.stream.closed():
-          data = f.read(options.chunksize)
-          if not data:
-            break
-          #write binary data into our output buffer and then flush the
-          #buffer to the network. This vastly increases download time and
-          #decreases the memory requirements on the server as we no longer
-          #have to buffer the entire file body in server ram
-          self.write(data)
-          self.flush()
-      self.finish()
+    filesize = str(os.path.getsize(system_filepath))
+    filename = os.path.basename(system_filepath)
+    print 'file ' + filename + ' requested at ' + system_filepath + ' of size ' + filesize
+    self.set_header('Content-type', 'octet/stream')
+    self.set_header('Content-Disposition', 'attachment; filename="' + filename+'"')
+    self.set_header('Content-Length',filesize)
+    
+    #send the file as a series of arbitrary chunk sizes
+    with open(system_filepath, 'rb') as f:
+      #dumb required check to see if iostream object has failed
+      #no other way to detect broken pipe, apparently
+      while not self.request.connection.stream.closed():
+        data = f.read(options.chunksize)
+        if not data:
+          break
+        #write binary data into our output buffer and then flush the
+        #buffer to the network. This vastly increases download time and
+        #decreases the memory requirements on the server as we no longer
+        #have to buffer the entire file body in server ram
+        self.write(data)
+        self.flush()
+    self.finish()
 
-    #handle directory request
-    else:
-      items = os.listdir(system_filepath)
-      files = []
-
-      for item in items:
-        current_file = filedata(system_filepath,item)
-        files.append(current_file)
-      #sort the files in the directory according to their timestamp
-      files.sort(key = lambda x: x.epoch_time,reverse=True)
-      
-      #form a friendly path to this directory, appending base system directory
-      #name to the URL path
-      directory_name = os.path.basename(os.path.normpath(options.dir)) + '/'
-      if(filepath):
-        directory_name = directory_name  + os.path.basename(os.path.normpath(system_filepath))
-
-      #form list of recursive file directory path, so we can write links to all levels
-      #in the HTML template.
-      paths = []
-      localpath = filepath
-      while(True):
-        (pa, se, di) = localpath.rpartition('/')
-        if di:
-          paths.insert(0, pathdata(di,localpath) )
-        if not se: break
-        localpath = pa
-      base_dir = os.path.basename(os.path.normpath(os.path.abspath(options.dir)))
-      base_dir = base_dir.replace('/','')
-      paths.insert(0,pathdata(base_dir,''))
-      
-      self.render("main.html",title=directory_name,path=filepath, files=files, path_urls=paths)
-
-class LoginHandler(tornado.web.RequestHandler):#BaseHandler):
+class Login(tornado.web.RequestHandler):#BaseHandler):
   def get(self):
     self.render("login.html")
 
@@ -195,8 +206,10 @@ class FileServer(tornado.web.Application):
     "debug":"True",
     }
     handlers = [
-      (r'/login', LoginHandler),
-      (r'/(.*)', Download),
+      (r'/login', Login),
+      (r'/',List),
+      (r'/(.*)/', List),
+      (r'/(.*)', Download)
     ]
     super(FileServer,self).__init__(handlers,**settings)
 
