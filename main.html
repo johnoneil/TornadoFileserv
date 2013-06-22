@@ -23,7 +23,15 @@
 		{% for f in files %}
 		<tr>
 			<td>{{ escape(f.timestamp) }}</td>
-			<td>{{ escape(f.file_type) }}</td>
+			<td>
+			{% if f.file_type == 'video' %}<img src="/static/icons/movie.gif"/>
+			{% elif f.file_type == 'audio' %}<img src="/static/icons/sound2.gif"/>
+			{% elif f.file_type == 'picture' %}<img src="/static/icons/image-x-generic.png"/>
+			{% elif f.file_type == 'dir' %}<img src="/static/icons/dir.gif"/>
+			{% elif f.file_type == 'archive' %}<img src="/static/icons/package-x-generic.png"/>
+			{% else %}<img src="/static/icons/generic.gif"/>
+			{% end %}
+			</td>
 			{% if path %}
 				<td><a href="{{ escape(  '/' + path + '/' + f.filename) }}">{{ escape(f.filename) }}</a></td>
 			{% else %}

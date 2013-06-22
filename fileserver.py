@@ -52,8 +52,10 @@ class filedata:
         return 'video'
       if(extension == '.mp3' or extension == '.ogg' or extension == '.flac'):
         return 'audio'
-      if extension == '.zip':
-        return 'zip'
+      if(extension == '.gif' or extension == '.png' or extension == '.jpg'):
+        return 'picture'
+      if extension == '.zip' or extension == '.tar' or extension == '.gzip':
+        return 'archive'
       return 'file'
     else:
       return 'dir'
