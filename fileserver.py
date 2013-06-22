@@ -94,8 +94,14 @@ class List(tornado.web.RequestHandler):
     self.render(options.static + 'main.html',title='Contents of '+ directory_name, items=files)
 
 class Download(tornado.web.RequestHandler):
+  def get_current_user(self):
+    return self.get_secure_cookie("user")
+
+  @tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath):
+    print 'current user is ' + tornado.escape.xhtml_escape(self.current_user)
+
     #for root URL, filepath is apparently disagreeable
     if not filepath:filepath=''
 
@@ -170,6 +176,13 @@ class Download(tornado.web.RequestHandler):
       
       self.render("main.html",title=directory_name,path=filepath, files=files, path_urls=paths)
 
+class LoginHandler(tornado.web.RequestHandler):#BaseHandler):
+  def get(self):
+    self.render("login.html")
+
+  def post(self):
+    self.set_secure_cookie("user", self.get_argument("name"))
+    self.redirect("/")
 
 class FileServer(tornado.web.Application):
   def __init__(self, dir_path):
@@ -179,8 +192,10 @@ class FileServer(tornado.web.Application):
     "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
     "login_url": "/login",
     "xsrf_cookies": True,
+    "debug":"True",
     }
     handlers = [
+      (r'/login', LoginHandler),
       (r'/(.*)', Download),
     ]
     super(FileServer,self).__init__(handlers,**settings)
