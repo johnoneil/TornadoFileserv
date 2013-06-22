@@ -24,12 +24,12 @@
 		<tr>
 			<td>{{ escape(f.timestamp) }}</td>
 			<td>
-			{% if f.file_type == 'video' %}<img src="/static/icons/movie.gif"/>
-			{% elif f.file_type == 'audio' %}<img src="/static/icons/sound2.gif"/>
-			{% elif f.file_type == 'picture' %}<img src="/static/icons/image-x-generic.png"/>
-			{% elif f.file_type == 'dir' %}<img src="/static/icons/dir.gif"/>
-			{% elif f.file_type == 'archive' %}<img src="/static/icons/package-x-generic.png"/>
-			{% else %}<img src="/static/icons/generic.gif"/>
+			{% if f.file_type == 'video' %}<img src="/static/icons/movie.gif" alt="video" title="video"/>
+			{% elif f.file_type == 'audio' %}<img src="/static/icons/sound2.gif" alt="audio" title="audio"/>
+			{% elif f.file_type == 'picture' %}<img src="/static/icons/image-x-generic.png" alt="picture" title="picture"/>
+			{% elif f.file_type == 'dir' %}<img src="/static/icons/dir.gif" alt="dir" title="dir"/>
+			{% elif f.file_type == 'archive' %}<img src="/static/icons/package-x-generic.png" alt="archive" title="archive"/>
+			{% else %}<img src="/static/icons/generic.gif" alt="file" title="file"/>
 			{% end %}
 			</td>
 			{% if path %}
