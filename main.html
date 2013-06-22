@@ -27,12 +27,7 @@
 			{% if path %}{{ escape(f.filename) }}</a></td>
 			{% else %}{{ escape(f.filename) }}</a></td>
 			{% end %}
-			
-			{% if f.file_type != 'dir' %}
-				<td> {{f.size}} bytes </td>
-			{% else %}
-				<td>  </td>
-			{% end %}
+			<td> {{ f.friendly_size }}</td>
 		</tr>
 		{% end %}
 		</table>

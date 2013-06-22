@@ -38,12 +38,13 @@ class filedata:
     self.epoch_time =  time.localtime(os.path.getmtime(self.full_path))
     self.timestamp = time.strftime('%a, %b %d %Y', self.epoch_time)
     self.file_type = self.GetFileType(self.full_path)
-    self.size = str(os.path.getsize(self.full_path))
+    file_size = os.path.getsize(self.full_path)
+    self.size = str(file_size)
+    self.friendly_size = self.HumanReadableFileSize(file_size,self.file_type)
 
   def GetFileType(self, filepath):
     if not os.path.exists(filepath):
       return 'unknown'
-    #print 'determining natrue of file ' + filepath
     if os.path.isfile(filepath):
       name,extension = os.path.splitext(filepath)
       extension = extension.lower()
@@ -63,6 +64,16 @@ class filedata:
       return 'file'
     else:
       return 'dir'
+
+  #http://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
+  def HumanReadableFileSize(self, num, file_type):
+    if file_type == 'dir':
+      return ''
+    for x in ['bytes','KB','MB','GB']:
+        if num < 1024.0:
+            return "%3.1f%s" % (num, x)
+        num /= 1024.0
+    return "%3.1f%s" % (num, 'TB')
 
 class pathdata:
   def __init__(self,name,path):
@@ -87,11 +98,9 @@ class Download(tornado.web.RequestHandler):
   def get(self, filepath):
     #for root URL, filepath is apparently disagreeable
     if not filepath:filepath=''
-    print "filepath is " + filepath
 
     #discern our local system internal path corresponding to the URL
     system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
-    print 'System local filepath for GET is "' + system_filepath +'"'
 
     #TODO: Limit paths to children of base path (confine browsing)
 
@@ -130,7 +139,6 @@ class Download(tornado.web.RequestHandler):
 
     #handle directory request
     else:
-      print 'handling directory ' + system_filepath
       items = os.listdir(system_filepath)
       files = []
 
