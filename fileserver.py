@@ -160,11 +160,15 @@ class Download(tornado.web.RequestHandler):
 class FileServer(tornado.web.Application):
   def __init__(self, dir_path):
     self.dir_path = dir_path
+    settings = {
+    "static_path": options.static,
+    "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+    "login_url": "/login",
+    "xsrf_cookies": True,
+    }
     handlers = [
-      (r"/static/(.*)", tornado.web.StaticFileHandler, {'path': options.static }),
       (r'/(.*)', Download),
     ]
-    settings = {}
     super(FileServer,self).__init__(handlers,**settings)
 
 def main():
