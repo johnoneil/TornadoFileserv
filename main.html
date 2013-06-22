@@ -20,13 +20,9 @@
 		<tr>
 			<td>{{ escape(f.timestamp) }}</td>
 			<td>
-			{% if path %}<a href="{{ escape(  '/' + path + '/' + f.filename) }}">
-			{% else %}<a href="{{ escape( '/' + f.filename) }}">
-			{% end %}
+			<a href="{{ escape( f.filename) }}">
 			<img src="/static/icons/{{ f.file_type }}.gif" alt="{{ f.file_type }}" title="{{ f.file_type }}"/>
-			{% if path %}{{ escape(f.filename) }}</a></td>
-			{% else %}{{ escape(f.filename) }}</a></td>
-			{% end %}
+			{{ escape(f.filename) }}</a></td>
 			<td> {{ f.friendly_size }}</td>
 		</tr>
 		{% end %}

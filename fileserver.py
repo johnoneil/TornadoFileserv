@@ -92,7 +92,8 @@ class List(tornado.web.RequestHandler):
     print 'current user is ' + tornado.escape.xhtml_escape(self.current_user)
 
     #for root URL, filepath is apparently disagreeable
-    if not filepath:filepath=''
+    if not filepath:filepath='/'
+    #filepath = filepath + '/'
     print 'listing contents of directory :' + filepath
 
     #discern our local system internal path corresponding to the URL
@@ -187,7 +188,7 @@ class Download(tornado.web.RequestHandler):
         self.flush()
     self.finish()
 
-class Login(tornado.web.RequestHandler):#BaseHandler):
+class Login(tornado.web.RequestHandler):
   def get(self):
     self.render("login.html")
 
