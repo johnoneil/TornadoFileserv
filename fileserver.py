@@ -13,15 +13,8 @@ import tornado.web
 import tornado.websocket
 import tornado.ioloop
 import tornado.iostream
-import socket
-import string
-import json
-import time
-import datetime
-import calendar
 import os
-import re
-import glob
+import time
 import sys
 import base64
 import uuid
@@ -92,12 +85,8 @@ class List(tornado.web.RequestHandler):
   @tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath=''):
-    print 'current user is ' + tornado.escape.xhtml_escape(self.current_user)
-
     #for root URL, filepath is apparently disagreeable
     if not filepath:filepath='/'
-    #filepath = filepath + '/'
-    print 'listing contents of directory :' + filepath
 
     #discern our local system internal path corresponding to the URL
     system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
@@ -151,11 +140,8 @@ class Download(tornado.web.RequestHandler):
   @tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath):
-    print 'current user is ' + tornado.escape.xhtml_escape(self.current_user)
-
     #for root URL, filepath is apparently disagreeable
     if not filepath:filepath=''
-    print 'Serving file ' + filepath
 
     #discern our local system internal path corresponding to the URL
     system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
