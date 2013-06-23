@@ -20,7 +20,7 @@
 		<tr>
 			<td>{{ escape(f.timestamp) }}</td>
 			<td>
-			<a href="{{ escape( f.filename) }}">
+			<a href="{{ url_escape( f.filename, plus=False) }}">
 			<img src="/static/icons/{{ f.file_type }}.gif" alt="{{ f.file_type }}" title="{{ f.file_type }}"/>
 			{{ escape(f.filename) }}</a></td>
 			<td> {{ f.friendly_size }}</td>

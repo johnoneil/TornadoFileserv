@@ -36,7 +36,7 @@ define('static',default='./')
 class filedata:
   def __init__(self,filepath,filename):
     self.filename = filename
-    self.full_path = filepath + '/' + filename
+    self.full_path = filepath + '/' + self.filename
     if os.path.isdir(self.full_path):
       self.filename = self.filename + '/'
     self.epoch_time =  time.localtime(os.path.getmtime(self.full_path))
