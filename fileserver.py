@@ -23,6 +23,8 @@ import os
 import re
 import glob
 import sys
+import base64
+import uuid
 
 #tornado command line options support
 from tornado.options import define, options
@@ -201,7 +203,7 @@ class FileServer(tornado.web.Application):
     self.dir_path = dir_path
     settings = {
     "static_path": options.static,
-    "cookie_secret": "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+    "cookie_secret": base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes),
     "login_url": "/login",
     "xsrf_cookies": True,
     "debug":"True",
