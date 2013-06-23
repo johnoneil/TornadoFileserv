@@ -15,38 +15,38 @@ div#wrap {
 	margin: 0 auto;
 }
 
-table {
+#wrap table {
 	width: 100%;
 	marign: auto;
 	border-collapse: collapse;
 }
 
-th {
+#wrap th {
 	text-align: left;
 	border-bottom: 1px solid #fff;
 	margin-bottom: 10px;
 }
-td {
+#wrap td {
 	font-size: 13px;
 	border-bottom: 1px solid #555;
 }
-td:nth-child(1) {
+#wrap td:nth-child(1) {
     width: 80px;
     font-size: 8px;
 }
 
-td:nth-child(3) {
+#wrap td:nth-child(3) {
     font-size: 8px;
     width: 80px;
     text-align: right;
 }
 
-td a {
+#wrap td a {
 	display: block;
 	padding: 5px 0;
 }
 
-td a:hover {
+#wrap td a:hover {
 	background-color: rgba(255,255,255,0.1);
 	color: yellow ;
 }

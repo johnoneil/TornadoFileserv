@@ -32,6 +32,7 @@ define('port', default=8888)
 define('dir',default='.')
 define('chunksize',default=16384)
 define('static',default='./')
+define('password',default='')
 
 class filedata:
   def __init__(self,filepath,filename):
@@ -195,6 +196,8 @@ class Login(tornado.web.RequestHandler):
     self.render("login.html")
 
   def post(self):
+    if(self.get_argument('pwd') != options.password):
+      self.redirect("/login")
     self.set_secure_cookie("user", self.get_argument("name"))
     self.redirect("/")
 
