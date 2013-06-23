@@ -201,6 +201,11 @@ class Login(tornado.web.RequestHandler):
     self.set_secure_cookie("user", self.get_argument("name"))
     self.redirect("/")
 
+class Logout(tornado.web.RequestHandler):
+  def get(self):
+    self.clear_cookie("user")
+    self.redirect('/login')
+
 class FileServer(tornado.web.Application):
   def __init__(self, dir_path):
     self.dir_path = dir_path
@@ -213,6 +218,7 @@ class FileServer(tornado.web.Application):
     }
     handlers = [
       (r'/login', Login),
+      (r'/logout',Logout),
       (r'/',List),
       (r'/(.*)/', List),
       (r'/(.*)', Download)
