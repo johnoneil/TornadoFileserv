@@ -20,11 +20,12 @@ import base64
 import uuid
 
 #tornado command line options support
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 from tornado.options import define, options
 define('port', default=8888)
 define('dir',default='.')
 define('chunksize',default=16384)
-define('static',default='./')
+define('static',default=CURRENT_DIR)
 define('password',default='')
 
 class filedata:
@@ -40,24 +41,30 @@ class filedata:
     self.size = str(file_size)
     self.friendly_size = self.HumanReadableFileSize(file_size,self.file_type)
 
+  video_types = ['.mov', '.avi', '.mpg', '.mkv', '.mp4', '.flv', '.m4v']
+  audio_types = ['mp3', '.ogg', '.flac']
+  image_types = ['.gif', '.png', '.jpg']
+  archive_types = ['.zip', '.tar', 'gzip', '.gz', '.rar']
+  text_types = ['.txt']
+  pdf_types = ['.pdf']
+
   def GetFileType(self, filepath):
     if not os.path.exists(filepath):
       return 'unknown'
     if os.path.isfile(filepath):
       name,extension = os.path.splitext(filepath)
       extension = extension.lower()
-      if(extension == '.mov' or extension == '.avi' or extension == '.mpg'
-        or extension == '.mkv' or extension == '.mp4' or extension == '.flv'):
+      if extension in filedata.video_types:
         return 'video'
-      if(extension == '.mp3' or extension == '.ogg' or extension == '.flac'):
+      if extension in filedata.audio_types:
         return 'audio'
-      if(extension == '.gif' or extension == '.png' or extension == '.jpg'):
+      if extension in filedata.image_types:
         return 'image'
-      if extension == '.zip' or extension == '.tar' or extension == '.gzip':
+      if extension in filedata.archive_types:
         return 'archive'
-      if extension == '.txt':
+      if extension in filedata.text_types:
         return 'text'
-      if extension == '.pdf':
+      if extension in filedata.pdf_types:
         return 'pdf'
       return 'file'
     else:
@@ -82,7 +89,7 @@ class List(tornado.web.RequestHandler):
   def get_current_user(self):
     return self.get_secure_cookie("user")
 
-  @tornado.web.authenticated
+  #@tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath=''):
     #for root URL, filepath is apparently disagreeable
@@ -92,6 +99,7 @@ class List(tornado.web.RequestHandler):
     system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
 
     #TODO: Limit paths to children of base path (confine browsing)
+    #print 'Going to render path {path}'.format(path=system_filepath)
 
     #is this a nonsense URL?
     if not os.path.exists(system_filepath):
@@ -102,6 +110,7 @@ class List(tornado.web.RequestHandler):
       return self.send_error(status_code=404)
 
     #render the contents fo the system directory path
+    
     items = os.listdir(system_filepath)
     files = []
 
@@ -137,11 +146,13 @@ class Download(tornado.web.RequestHandler):
   def get_current_user(self):
     return self.get_secure_cookie("user")
 
-  @tornado.web.authenticated
+  #@tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath):
     #for root URL, filepath is apparently disagreeable
     if not filepath:filepath=''
+
+    print 'Get on filepath {filepath}'.format(filepath=filepath)
 
     #discern our local system internal path corresponding to the URL
     system_filepath = os.path.normpath(os.path.abspath(options.dir +'/'+ filepath))
@@ -182,9 +193,9 @@ class Login(tornado.web.RequestHandler):
     self.render("login.html")
 
   def post(self):
-    if(self.get_argument('pwd') != options.password):
-      self.redirect("/login")
-    self.set_secure_cookie("user", self.get_argument("name"))
+    #if(self.get_argument('pwd') != options.password):
+    #  self.redirect("/login")
+    #self.set_secure_cookie("user", self.get_argument("name"))
     self.redirect("/")
 
 class Logout(tornado.web.RequestHandler):
@@ -214,6 +225,8 @@ class FileServer(tornado.web.Application):
 def main():
 
   tornado.options.parse_command_line()
+
+  print 'Starting fileserv on directory "{dir}".'.format(dir=options.dir)
 
   application = FileServer(options.dir)
   application.listen(options.port)
