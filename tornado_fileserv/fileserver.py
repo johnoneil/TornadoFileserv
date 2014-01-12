@@ -26,7 +26,7 @@ define('port', default=8888)
 define('dir',default='.')
 define('chunksize',default=16384)
 define('static',default=CURRENT_DIR)
-define('password',default='')
+define('password',default=None)
 
 class filedata:
   def __init__(self,filepath,filename):
@@ -89,7 +89,7 @@ class List(tornado.web.RequestHandler):
   def get_current_user(self):
     return self.get_secure_cookie("user")
 
-  #@tornado.web.authenticated
+  @tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath=''):
     #for root URL, filepath is apparently disagreeable
@@ -146,7 +146,7 @@ class Download(tornado.web.RequestHandler):
   def get_current_user(self):
     return self.get_secure_cookie("user")
 
-  #@tornado.web.authenticated
+  @tornado.web.authenticated
   @tornado.web.asynchronous
   def get(self, filepath):
     #for root URL, filepath is apparently disagreeable
@@ -193,9 +193,10 @@ class Login(tornado.web.RequestHandler):
     self.render("login.html")
 
   def post(self):
-    #if(self.get_argument('pwd') != options.password):
-    #  self.redirect("/login")
-    #self.set_secure_cookie("user", self.get_argument("name"))
+    if options.password:
+      if self.get_argument('pwd') != options.password:
+        self.redirect("/login")
+    self.set_secure_cookie("user", self.get_argument("name"))
     self.redirect("/")
 
 class Logout(tornado.web.RequestHandler):
