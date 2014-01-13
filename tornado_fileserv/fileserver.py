@@ -29,11 +29,13 @@ define('static',default=CURRENT_DIR)
 define('password',default=None)
 
 class filedata:
-  def __init__(self,filepath,filename):
+  def __init__(self, filepath, filename):
     self.filename = filename
     self.full_path = filepath + '/' + self.filename
+    self.is_dir = False
     if os.path.isdir(self.full_path):
-      self.filename = self.filename + '/'
+      #self.filename = self.filename + '/'
+      self.is_dir = True
     self.epoch_time =  time.localtime(os.path.getmtime(self.full_path))
     self.timestamp = time.strftime('%a, %b %d %Y', self.epoch_time)
     self.file_type = self.GetFileType(self.full_path)
@@ -81,7 +83,7 @@ class filedata:
     return "%3.1f%s" % (num, 'TB')
 
 class pathdata:
-  def __init__(self,name,path):
+  def __init__(self, name, path):
     self.name = name
     self.path = path
 
@@ -113,10 +115,10 @@ class List(tornado.web.RequestHandler):
     
     items = os.listdir(system_filepath)
     files = []
-
     for item in items:
       current_file = filedata(system_filepath,item)
       files.append(current_file)
+      print 'file '+current_file.filename+' '+current_file.full_path + ' ' + str(current_file.is_dir)
     #sort the files in the directory according to their timestamp
     files.sort(key = lambda x: x.epoch_time,reverse=True)
     
@@ -140,7 +142,7 @@ class List(tornado.web.RequestHandler):
     base_dir = base_dir.replace('/','')
     paths.insert(0,pathdata(base_dir,''))
     
-    self.render("main.html",title=directory_name,path=filepath, files=files, path_urls=paths)
+    self.render("main.html", title=directory_name, path=filepath, files=files, path_urls=paths)
 
 class Download(tornado.web.RequestHandler):
   def get_current_user(self):
