@@ -11,7 +11,7 @@ a:hover {color:#FFFF00;text-decoration:none;}
 a:active {color:#FFFF00;text-decoration:none;}
 
 div#right{
-	font-size: 8px;
+	font-size: 12px;
 	text-align: right;
 }
 
@@ -31,16 +31,16 @@ div#wrap {
 	margin-bottom: 10px;
 }
 #wrap td {
-	font-size: 13px;
+	font-size: 16px;
 	border-bottom: 1px solid #555;
 }
 #wrap td:nth-child(1) {
     width: 80px;
-    font-size: 8px;
+    font-size: 12px;
 }
 
 #wrap td:nth-child(3) {
-    font-size: 8px;
+    font-size: 12px;
     width: 80px;
     text-align: right;
 }

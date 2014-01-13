@@ -2,9 +2,19 @@
  # vim: set ts=2 expandtab:
 """
 Module: fileserver
-Desc:
+Desc: Put a folder and subfolders on the web. Only downloads supported.
 Author: John O'Neil
-Email:
+Email: john.oneil@gmail.com
+
+Simple way to put a folder on the web. Isntallation of package give access to
+tool 'tornado-fileserv'
+
+Invoke the tool as follows:
+``tornado-fileserv --dir='/home/user.name/directory_to_put_on_web'``
+
+Port from which folder is accessible can also be specified.
+Large files (video files etc.) can also be served but they currently block the server
+during download.
 
 """
 #!/usr/bin/python
@@ -23,10 +33,10 @@ import uuid
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 from tornado.options import define, options
 define('port', default=8888)
-define('dir',default='.')
-define('chunksize',default=16384)
-define('static',default=CURRENT_DIR)
-define('password',default=None)
+define('dir', default='.')
+define('chunksize', default=16384)
+define('static', default=CURRENT_DIR)
+define('password', default=None)
 
 class filedata:
   def __init__(self, filepath, filename):
@@ -34,7 +44,6 @@ class filedata:
     self.full_path = filepath + '/' + self.filename
     self.is_dir = False
     if os.path.isdir(self.full_path):
-      #self.filename = self.filename + '/'
       self.is_dir = True
     self.epoch_time =  time.localtime(os.path.getmtime(self.full_path))
     self.timestamp = time.strftime('%a, %b %d %Y', self.epoch_time)
@@ -140,7 +149,7 @@ class List(tornado.web.RequestHandler):
       localpath = pa
     base_dir = os.path.basename(os.path.normpath(os.path.abspath(options.dir)))
     base_dir = base_dir.replace('/','')
-    paths.insert(0,pathdata(base_dir,''))
+    paths.insert(0, pathdata(base_dir,''))
     
     self.render("main.html", title=directory_name, path=filepath, files=files, path_urls=paths)
 
@@ -218,8 +227,8 @@ class FileServer(tornado.web.Application):
     }
     handlers = [
       (r'/login', Login),
-      (r'/logout',Logout),
-      (r'/',List),
+      (r'/logout', Logout),
+      (r'/', List),
       (r'/(.*)/', List),
       (r'/(.*)', Download)
     ]
