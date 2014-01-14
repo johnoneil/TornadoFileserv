@@ -60,7 +60,7 @@ Example
 -------
 Running the server on localhost port 8888 (default) as follows:
 ```
-
+tornado-fileserv --dir='/home/user/directory_of_interest' --password='xxx'
 ```
 Brings up the login screen at session start. If a password is defined as a command line option, the same password is required at signin. If none is specified it can be left blank.
 
