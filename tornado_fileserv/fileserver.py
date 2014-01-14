@@ -53,7 +53,7 @@ class filedata:
     self.friendly_size = self.HumanReadableFileSize(file_size,self.file_type)
 
   video_types = ['.mov', '.avi', '.mpg', '.mkv', '.mp4', '.flv', '.m4v']
-  audio_types = ['mp3', '.ogg', '.flac']
+  audio_types = ['.mp3', '.ogg', '.flac']
   image_types = ['.gif', '.png', '.jpg']
   archive_types = ['.zip', '.tar', 'gzip', '.gz', '.rar']
   text_types = ['.txt']
@@ -205,7 +205,7 @@ class Login(tornado.web.RequestHandler):
 
   def post(self):
     if options.password:
-      if self.get_argument('pwd') != options.password:
+      if self.get_argument('pwd', default='', strip=False) != options.password:
         self.redirect("/login")
     self.set_secure_cookie("user", self.get_argument("name"))
     self.redirect("/")
