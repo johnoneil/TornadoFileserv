@@ -1,5 +1,5 @@
-TornadoFileserv
-===============
+tornado_fileserv
+================
 
 Simple Tornado based fileserver. Meant as brainless (and secure) way to get a system folder on the web.
 
@@ -56,4 +56,17 @@ Options:
 ```
 The static directory above points to the location of static assets. On second thought this option ought to be removed.
 
+Example
+-------
+Running the server on localhost port 8888 (default) as follows:
+```
+
+```
+Brings up the login screen at session start. If a password is defined as a command line option, the same password is required at signin. If none is specified it can be left blank.
+
+![signin screen](images/sign_in.png "Example tornado fileserv login screen.")
+
+And once signed in, simple directory contents are available. Click files to initiate download, click directories to recurse. Note unicode filenames are well handled.
+
+![example directory contents](images/list.png "Example tornado_fileserv directory contents display.")
 
